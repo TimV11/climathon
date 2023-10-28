@@ -27,10 +27,12 @@ def mask_s2_clouds(image):
 
   return image.updateMask(mask).divide(10000)
 
+def set_time(image):
+  return image.set({'system:time_start':image.date().millis()})
 
 st.set_page_config(layout="wide")
 
-st.title("NeyJourNeyJour")
+st.title("CanopyAI")
 
 col1, col2 = st.columns([4, 1])
 
@@ -39,49 +41,38 @@ Map.add_basemap("ESA WorldCover 2020 S2 FCC")
 Map.add_basemap("ESA WorldCover 2020 S2 TCC")
 Map.add_basemap("HYBRID")
 
+aoi = ee.Geometry.Polygon(
+  [[[8.559718,  49.952662],
+    [8.559718, 49.794677],
+    [8.752842, 49.794677],
+    [8.752842, 49.952662]]]
+  )
+
+
 
 sent2 = ee.ImageCollection("COPERNICUS/S2_SR_HARMONIZED").first()
 sent2_vis = {"bands": ["B2","B3","B4"]}
 
 esa = ee.ImageCollection("ESA/WorldCover/v100").first()
 esa_vis = {"bands": ["Map"]}
-#esri = ee.ImageCollection(
-#    "projects/sat-io/open-datasets/landcover/ESRI_Global-LULC_10m"
-#).mosaic()
-#esri_vis = {
-#    "min": 1,
-#    "max": 10,
-#    "palette": [
-#        "#1A5BAB",
-#        "#358221",
-#        "#A7D282",
-#        "#87D19E",
-#        "#FFDB5C",
-#        "#EECFA8",
-#        "#ED022A",
-#        "#EDE9E4",
-#        "#F2FAFF",
-#        "#C8C8C8",
-#    ],
-#}
 
-dataset = (
-    ee.ImageCollection('COPERNICUS/S2_SR_HARMONIZED')
-    .filterDate('2018-01-01', '2022-01-30')
-    .filter(ee.Filter.lt('CLOUDY_PIXEL_PERCENTAGE', 20))
-    .map(mask_s2_clouds)
-)
+vis_params = {
+    'min': 0,
+    'max': 3000,
+    'bands': ['B4', 'B3', 'B2'],
+    }
 
-visualization = {
-    'min': 0.0,
-    'max': 0.3,
-    'bands': ['B4'],
-}
+vis_ndvi_params = {
+        'min': -1,
+        'max': 0.5,
+        'palette': ['0c8204','a3a3a3']
+        }
 
-#m = geemap.Map()
-#m.set_center(83.277, 17.7009, 12)
-#m.add_layer(dataset.mean(), visualization, 'RGB')
-#   m
+vis_ndvi_delta = {
+        'min': -0.05,
+        'max': 0.05,
+        'palette': ['FF5733', 'AAFF00']
+        }
 
     
 with col2:
@@ -98,15 +89,50 @@ with col2:
     start_date = start.strftime("%Y-%m-%d")
     end_date = end.strftime("%Y-%m-%d")
 
+
+    # Sentinel 2 Visual params
+    sentinel_2 = (
+        ee.ImageCollection('COPERNICUS/S2_SR_HARMONIZED')
+        .map(set_time)
+        .filterBounds(aoi)
+        .filterDate(start_date, end_date)
+        .filter(ee.Filter.lt('CLOUDY_PIXEL_PERCENTAGE', 1))
+    )
+
+
+    # NDVI 
+    NIR = sentinel_2.select('B4').first()
+    Red = sentinel_2.select('B3').first()
+
+    ndvi = NIR.subtract(Red).divide(NIR.add(Red))
+
+
+    # NDVI DELTA
+    NIR_first = sentinel_2.select('B4').first()
+    Red_first = sentinel_2.select('B3').first()
+    ndvi_first = NIR_first.subtract(Red_first).divide(NIR_first.add(Red_first))
+
+    sentinel_2_backwards = sentinel_2.sort('system:time_start', False)
+    NIR_last = sentinel_2_backwards.select('B4').first()
+    Red_last = sentinel_2_backwards.select('B3').first()
+    ndvi_last = NIR_last.subtract(Red_last).divide(NIR_last.add(Red_last))
+
+    ndvi_diff = ndvi_last.subtract(ndvi_first)
+
+
+    # NDVI DELTA - town
+    # ndvi_diff_minus_town =  
+
+
     region = ee.Geometry.BBox(-179, -89, 179, 89)
     dw = geemap.dynamic_world(region, start_date, end_date, return_type="hillshade")
 
     layers = {
         "Dynamic World": (dw, {}, "Dynamic World Land Cover"),
         "ESA Land Cover": (esa, esa_vis, "ESA Land Cover"),
-        "Sentinel 2 B4": (dataset, visualization, "Sentinel 2"),
-        "Sentinel 2 [B2 - B8]": (sent2, sent2_vis, "Sentinel 2")
-        #"ESRI Land Cover": (esri, esri_vis, "ESRI Land Cover"),
+        "Sentinel 2 Visual Params": (sentinel_2, vis_params,"Sentinel 2 Visual Params"),
+        "Sentinel 2 NDVI": (ndvi, vis_ndvi_params, "Sentinel 2 NDVI"),
+        "NDVI Delta": (ndvi_diff, vis_ndvi_delta, "NDVI Delta"),
     }
 
     options = list(layers.keys())
@@ -114,19 +140,15 @@ with col2:
     
     Map.add_layer(*layers[selected_layer_key])
     
-    #Map.addLayer(OverlayMap)
-    #Map.split_map(left_layer, right_layer)
-
-    #legend = st.selectbox("Select a legend", options, index=options.index(right))
-    #if legend == "Dynamic World":
-        #Map.add_legend(
-            #title="Dynamic World Land Cover",
-            #builtin_legend="Dynamic_World",
-        #)
-    #elif legend == "ESA Land Cover":
-        #Map.add_legend(title="ESA Land Cover", builtin_legend="ESA_WorldCover")
-    #elif legend == "ESRI Land Cover":
-        #Map.add_legend(title="ESRI Land Cover", builtin_legend="ESRI_LandCover")
+    if selected_layer_key == "Dynamic World":
+        Map.add_legend(
+            title="Dynamic World Land Cover",
+            builtin_legend="Dynamic_World",
+        )
+    elif selected_layer_key == "ESA Land Cover":
+        Map.add_legend(title="ESA Land Cover", builtin_legend="ESA_WorldCover")
+    #elif legend == "Sentinel 2 Visual Params":
+    #    Map.add_legend(title="Sentinel 2 Visual Params", builtin_legend="Sentinel 2")
 
 with col1:
     Map.to_streamlit(height=750)
