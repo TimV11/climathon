@@ -3,6 +3,24 @@ import ee
 import streamlit as st
 import geemap.foliumap as geemap
 
+
+st.set_page_config(layout="wide")
+
+st.sidebar.title("Contact Us")
+st.sidebar.info(
+    """ [Send us an E-Mail!](mailto:contact@climathon.digital) """
+)
+
+st.sidebar.title("Source Code")
+st.sidebar.info(
+
+    """
+    - Web App URL: <http://climathon.digital:8501/>
+    - Our GitHub Repository: <https://github.com/TimV11/climathon>
+    """
+)
+
+
 def mask_s2_clouds(image):
   """Masks clouds in a Sentinel-2 image using the QA band.
 
@@ -30,7 +48,6 @@ def mask_s2_clouds(image):
 def set_time(image):
   return image.set({'system:time_start':image.date().millis()})
 
-st.set_page_config(layout="wide")
 
 st.title("Map Analytics")
 
@@ -44,8 +61,6 @@ aoi = ee.Geometry.Polygon(
     [8.752842, 49.794677],
     [8.752842, 49.952662]]]
   )
-
-
 
 sent2 = ee.ImageCollection("COPERNICUS/S2_SR_HARMONIZED").first()
 sent2_vis = {"bands": ["B2","B3","B4"]}
