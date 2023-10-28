@@ -12,10 +12,26 @@ col1, col2 = st.columns([4, 1])
 
 Map = geemap.Map()
 
+aoi = ee.Geometry.Polygon(
+  [[[8.559718,  49.952662],
+    [8.559718, 49.794677],
+    [8.752842, 49.794677],
+    [8.752842, 49.952662]]]
+  )
+
+sentinel_2 = (
+    ee.ImageCollection('COPERNICUS/S2_SR_HARMONIZED')
+      .map(set_time)
+      .filterBounds(aoi)
+      .filterDate('2017-04-01', '2023-10-27')
+      .filter(ee.Filter.lt('CLOUDY_PIXEL_PERCENTAGE', 1))
+      .select(['B4'])
+)
+
 esa = ee.ImageCollection("ESA/WorldCover/v100").first()
 esa_vis = {"bands": ["Map"]}
 
-Map.add_layer(esa, esa_vis, "ESA Land Cover")
+Map.add_layer(sentinel_2, esa_vis, "sentinel_2")
 
 markdown = """
     - [Dynamic World Land Cover](https://developers.google.com/earth-engine/datasets/catalog/GOOGLE_DYNAMICWORLD_V1?hl=en)
