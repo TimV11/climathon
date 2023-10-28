@@ -48,7 +48,7 @@ with tab1:
     st.markdown("**Actionable Recommendations**")
     st.write("We deliver actionable recommendations, empowering you to take effective measures for forest revitalization.")
 
-    st.subheader("Get in Touch.")
+    st.subheader("📬 Get in Touch.")
 
     st.markdown('<a href="mailto:contact@climathon.digital">Contact us !</a>', unsafe_allow_html=True)
 
@@ -64,6 +64,7 @@ with tab2:
             st.write('centralized to darmstadt')
         else:
             st.write('')
+            
     st.link_button("Get started", "http://climathon.digital:8501/gmap_base")
     
 
