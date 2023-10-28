@@ -33,7 +33,7 @@ with tab1:
     st.header("Revitalizing Forests with Satellite Intelligence.")
     with st.container():
         st.subheader("CanopyAI: Your Forest's Guardian.")
-        st.link_button("Go to gallery", "http://climathon.digital:8501/gmap_base")
+        st.link_button("Get started", "http://climathon.digital:8501/gmap_base")
 
 
     with st.container():
