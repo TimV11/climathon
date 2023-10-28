@@ -30,13 +30,6 @@ sentinel_2 = (
       .filter(ee.Filter.lt('CLOUDY_PIXEL_PERCENTAGE', 1))
 )
 
-vis_params = {
-    'min': 0,
-    'max': 3000,
-    'bands': ['B4', 'B3', 'B2'],
-    }
-Map.add_layer(sentinel_2, vis_params,"sentinel_2")
-
 markdown = """
     - [Dynamic World Land Cover](https://developers.google.com/earth-engine/datasets/catalog/GOOGLE_DYNAMICWORLD_V1?hl=en)
     - [ESA Global Land Cover](https://developers.google.com/earth-engine/datasets/catalog/ESA_WorldCover_v100)
@@ -52,11 +45,29 @@ with col2:
 
     Map.setCenter(longitude, latitude, zoom)
 
-    start = st.date_input("Start Date for Dynamic World", datetime.date(2020, 1, 1))
-    end = st.date_input("End Date for Dynamic World", datetime.date(2021, 1, 1))
+    date = st.date_input("Date", datetime.date(2020, 1, 1))
+    date_date = date.strftime("%Y-%m-%d")
 
-    start_date = start.strftime("%Y-%m-%d")
-    end_date = end.strftime("%Y-%m-%d")
+    vis_params = {
+    'min': 0,
+    'max': 3000,
+    'bands': ['B4', 'B3', 'B2'],
+    }
+
+    vis_ndvi_params = {
+        'min': -1,
+        'max': 0.5,
+        'palette': ['FFFFFF', '274e13']
+        }
+
+    NIR = sentinel_2.select('B4').first()
+    Red = sentinel_2.select('B3').first()
+
+    ndvi = NIR.subtract(Red).divide(NIR.add(Red))
+
+    Map.add_layer(sentinel_2, vis_params,"sentinel_2")
+    Map.add_layer(ndvi,vis_ndvi_params,"NDVI")
+
 
 with col1:
     Map.to_streamlit(height=750)
