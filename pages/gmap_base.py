@@ -12,6 +12,9 @@ col1, col2 = st.columns([4, 1])
 
 Map = geemap.Map()
 
+def set_time(image):
+  return image.set({'system:time_start':image.date().millis()})
+
 aoi = ee.Geometry.Polygon(
   [[[8.559718,  49.952662],
     [8.559718, 49.794677],
@@ -25,13 +28,14 @@ sentinel_2 = (
       .filterBounds(aoi)
       .filterDate('2017-04-01', '2023-10-27')
       .filter(ee.Filter.lt('CLOUDY_PIXEL_PERCENTAGE', 1))
-      .select(['B4'])
 )
 
-esa = ee.ImageCollection("ESA/WorldCover/v100").first()
-esa_vis = {"bands": ["Map"]}
-
-Map.add_layer(sentinel_2, esa_vis, "sentinel_2")
+vis_params = {
+    'min': 0,
+    'max': 3000,
+    'bands': ['B4', 'B3', 'B2'],
+    }
+Map.add_layer(sentinel_2, vis_params,"sentinel_2")
 
 markdown = """
     - [Dynamic World Land Cover](https://developers.google.com/earth-engine/datasets/catalog/GOOGLE_DYNAMICWORLD_V1?hl=en)
@@ -39,8 +43,6 @@ markdown = """
     - [ESRI Global Land Cover](https://samapriya.github.io/awesome-gee-community-datasets/projects/esrilc2020)
 
 """
-with col1:
-    Map.to_streamlit(height=750)
 
 with col2:
 
@@ -55,3 +57,6 @@ with col2:
 
     start_date = start.strftime("%Y-%m-%d")
     end_date = end.strftime("%Y-%m-%d")
+
+with col1:
+    Map.to_streamlit(height=750)
