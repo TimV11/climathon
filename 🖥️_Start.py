@@ -82,18 +82,40 @@ st.write("We deliver actionable recommendations, empowering you to take effectiv
 st.subheader("📬 Get in Touch")
 
 image_data = [
-    {"path": './pics/niclas.jpg',"text": "Lorem ipsum" , "name": "Niclas"},
-    {"path": './pics/tim.jpg',   "text": "Lorem ipsum" , "name": "Tim"},
-    {"path": './pics/theo.jpg',  "text": "Lorem ipsum" , "name": "Theo"},
-    {"path": './pics/benno.jpg', "text": "Lorem ipsum" , "name": "Benno"},
-    {"path": './pics/alfred.jpg',"text": "Lorem ipsum" , "name": "Alfred"},
-
+    {"path": './pics/niclas.jpg',"text": "Lorem ipsum" , "name": "Niclas" , "link" :'https://www.linkedin.com/in/niclas-schilling/'          },
+    {"path": './pics/tim.jpg',   "text": "Lorem ipsum" , "name": "Tim"    , "link" :'https://www.linkedin.com/in/tim%2Dvielhauer%2D66984026b/'  },
+    {"path": './pics/theo.jpg',  "text": "Lorem ipsum" , "name": "Theo"   , "link" :'https://www.linkedin.com/in/theodor-nguyen-816269133/'     },
+    {"path": './pics/benno.jpg', "text": "Lorem ipsum" , "name": "Benno"  , "link" :'https://www.linkedin.com/in/benno-koesters/'             },
+    {"path": './pics/alfred.jpg',"text": "Lorem ipsum" , "name": "Alfred" , "link" :'https://www.linkedin.com/in/alfred-quan-anh-nguyen/'    }
 ]
+
+
+
+
+
+
 
 # Create a row to display images and names horizontally
 row = st.columns(len(image_data))
 
 # Display images and names in the row
 for i, col in enumerate(row):
-    col.image(image_data[i]["path"], caption=image_data[i]["name"], use_column_width=True)
+    col.image(image_data[i]["path"], 
+              caption= image_data[i]["name"],
+              #caption= "[" + image_data[i]["name"] + "]" + "(" + image_data[i]["link"] + ")",
+              use_column_width=True)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
