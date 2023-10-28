@@ -22,15 +22,20 @@ st.markdown("""
 <style>
 
 	.stTabs [data-baseweb="tab-list"] {
-		gap: 2px;
+		gap: 10px;
+    }
+            
+    
+    .stTabs [data-baseweb="tab"] {
+        flex: 1;
     }
 
 	.stTabs [data-baseweb="tab"] {
 		height: 50px;
         white-space: pre-wrap;
 		background-color: #F0F2F6;
-		border-radius: 4px 4px 0px 0px;
-		gap: 1px;
+		border-radius: 4px 4px 4px 4px;
+		gap: 10px;
 		padding-top: 10px;
 		padding-bottom: 10px;
     }
@@ -49,10 +54,9 @@ st.markdown("""
 logo = Image.open('./pics/CanopyAI.png')
 st.image(logo)
 
-listTabs = ["Our purpose", "Case study: Darmstadt", "About us"]
+listTabs = ["  Our purpose  ", "  Case study: Darmstadt  ", "  About us  "]
 tabs = st.tabs(listTabs)
-whitespace = 9
-tabs = st.tabs([s.center(whitespace,"\u2001") for s in listTabs])
+
 with tabs[0]:
     
     st.header("Revitalizing Forests with Satellite Intelligence.")
