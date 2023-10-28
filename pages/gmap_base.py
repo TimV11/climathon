@@ -40,8 +40,11 @@ Map.add_basemap("ESA WorldCover 2020 S2 TCC")
 Map.add_basemap("HYBRID")
 
 
-esa = ee.ImageCollection("COPERNICUS/S2_SR_HARMONIZED").first()
-esa_vis = {"bands": ["B2","B3","B4","B8"]}
+sent2 = ee.ImageCollection("COPERNICUS/S2_SR_HARMONIZED").first()
+sent2_vis = {"bands": ["B2","B3","B4"]}
+
+esa = ee.ImageCollection("ESA/WorldCover/v100").first()
+esa_vis = {"bands": ["Map"]}
 #esri = ee.ImageCollection(
 #    "projects/sat-io/open-datasets/landcover/ESRI_Global-LULC_10m"
 #).mosaic()
@@ -64,8 +67,7 @@ esa_vis = {"bands": ["B2","B3","B4","B8"]}
 
 dataset = (
     ee.ImageCollection('COPERNICUS/S2_SR_HARMONIZED')
-    .filterDate('2020-01-01', '2022-01-30')
-    # Pre-filter to get less cloudy granules.
+    .filterDate('2018-01-01', '2022-01-30')
     .filter(ee.Filter.lt('CLOUDY_PIXEL_PERCENTAGE', 20))
     .map(mask_s2_clouds)
 )
@@ -81,6 +83,7 @@ visualization = {
 #m.add_layer(dataset.mean(), visualization, 'RGB')
 #   m
 
+    
 with col2:
 
     longitude = st.number_input("Longitude", -180.0, 180.0, 8.559718)
@@ -99,18 +102,19 @@ with col2:
     dw = geemap.dynamic_world(region, start_date, end_date, return_type="hillshade")
 
     layers = {
-        "Dynamic World": geemap.ee_tile_layer(dw, {}, "Dynamic World Land Cover"),
-        #"ESA Land Cover": geemap.ee_tile_layer(esa, esa_vis, "ESA Land Cover"),
-        #"ESRI Land Cover": geemap.ee_tile_layer(esri, esri_vis, "ESRI Land Cover"),
+        "Dynamic World": (dw, {}, "Dynamic World Land Cover"),
+        "ESA Land Cover": (esa, esa_vis, "ESA Land Cover"),
+        "Sentinel 2 B4": (dataset, visualization, "Sentinel 2"),
+        "Sentinel 2 [B2 - B8]": (sent2, sent2_vis, "Sentinel 2")
+        #"ESRI Land Cover": (esri, esri_vis, "ESRI Land Cover"),
     }
 
-    #options = list(layers.keys())
-    #left = st.selectbox("Select a left layer", options, index=1)
-    #right = st.selectbox("Select a right layer", options, index=0)
-
-    #left_layer = layers[left]
-    #right_layer = layers[right]
-
+    options = list(layers.keys())
+    selected_layer_key = st.selectbox("Select a layer", options, index=0)
+    
+    Map.add_layer(*layers[selected_layer_key])
+    
+    #Map.addLayer(OverlayMap)
     #Map.split_map(left_layer, right_layer)
 
     #legend = st.selectbox("Select a legend", options, index=options.index(right))
@@ -123,7 +127,6 @@ with col2:
         #Map.add_legend(title="ESA Land Cover", builtin_legend="ESA_WorldCover")
     #elif legend == "ESRI Land Cover":
         #Map.add_legend(title="ESRI Land Cover", builtin_legend="ESRI_LandCover")
-
 
 with col1:
     Map.to_streamlit(height=750)
