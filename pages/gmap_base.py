@@ -45,7 +45,6 @@ markdown = """
 """
 
 with col2:
-
     longitude = st.number_input("Longitude", -180.0, 180.0, 8.6512)
     latitude = st.number_input("Latitude", -90.0, 90.0, 49.8728)
     zoom = st.number_input("Zoom", 0, 20, 11)
