@@ -29,13 +29,13 @@ st.markdown(
 )
 
 
-st.write("# CanopyAI 🌳👑")
+logo = Image.open('./pics/CanopyAI.png')
+st.image(logo)
 
 tab1, tab2, tab3 = st.tabs(["landing page", "interactive map", "about us"])
 
 with tab1:
-    logo = Image.open('./pics/CanopyAI.png')
-    st.image(logo)
+    
     st.header("Revitalizing Forests with Satellite Intelligence.")
     with st.container():
         st.subheader("CanopyAI: Your Forest's Guardian.")
