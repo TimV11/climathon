@@ -32,7 +32,7 @@ def set_time(image):
 
 st.set_page_config(layout="wide")
 
-st.title("CanopyAI")
+st.title("Map Analytics")
 
 col1, col2 = st.columns([4, 1])
 

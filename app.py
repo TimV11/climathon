@@ -14,8 +14,12 @@ from datetime import datetime, timedelta
 #
 # ------------------------------------------------------------
 
+
+
+
 st.set_page_config(
-     initial_sidebar_state="collapsed",
+    #layout="wide",
+    initial_sidebar_state="collapsed",
 )
 
 st.markdown("""
@@ -88,37 +92,37 @@ with tabs[1]:
             st.write('centralized to darmstadt')
         else:
             st.write('')
-            
     st.link_button("Get started", "http://climathon.digital:8501/gmap_base")
     
 
 with tabs[2]:
+    col1, col2, col3 , col4, col5 = st.columns(5)
 
-    col1, col2, col3 = st.columns(3, gap="large")
 
-    with col1:
-        st.header("Theo")
-        theo = Image.open('./pics/theo.jpg').resize((400, 400))
-        st.image(theo, caption='https://www.linkedin.com/in/theodor-nguyen-816269133/')
+    # List of image file paths
+    image_paths = [ 
+        './pics/alfred.jpg', 
+        './pics/theo.jpg',
+        './pics/tim.jpg',
+        './pics/niclas.jpg',
+        './pics/benno.jpg']
 
-    with col2:
-        st.header("Tim")
-        tim = Image.open('./pics/tim.jpg').resize((400, 400))
-        st.image(tim, caption='https://www.linkedin.com/in/tim%2Dvielhauer%2D66984026b/')
 
-    with col3:
-        st.header("Alfred")
-        alfred = Image.open('./pics/alfred.jpg').resize((400, 400))
-        st.image(alfred, caption='https://www.linkedin.com/in/alfred-quan-anh-nguyen/')
 
-    col4, col5 = st.columns(2, gap="large")
-    with col4:
-        st.header("Niclas")
-        niclas = Image.open('./pics/niclas.jpg').resize((400, 400))
-        st.image(niclas, caption='https://www.linkedin.com/in/niclas-schilling/')
 
-    with col5:
-        st.header("Benno")
-        benno = Image.open('./pics/benno.jpg').resize((400, 400))
-        st.image(benno, caption='https://www.linkedin.com/in/benno-koesters/')
-    
+    # List of image file paths and corresponding names
+    image_data = [
+        {"path": './pics/niclas.jpg', "name": "Niclas"},
+        {"path": './pics/tim.jpg',    "name": "Tim"},
+        {"path": './pics/theo.jpg',   "name": "Theo"},
+        {"path": './pics/benno.jpg',  "name": "Benno"},
+        {"path": './pics/alfred.jpg', "name": "Alfred"},
+    ]
+
+    # Create a row to display images and names horizontally
+    row = st.columns(len(image_data))
+
+    # Display images and names in the row
+    for i, col in enumerate(row):
+        col.image(image_data[i]["path"], caption=image_data[i]["name"], use_column_width=True)
+
