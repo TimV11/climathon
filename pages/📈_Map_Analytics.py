@@ -1,7 +1,12 @@
+    
+    
+    
 import datetime
+import json
 import ee
 import streamlit as st
 import geemap.foliumap as geemap
+
 
 
 st.set_page_config(layout="wide")
@@ -19,6 +24,8 @@ st.sidebar.info(
     - Our GitHub Repository: <https://github.com/TimV11/climathon>
     """
 )
+
+
 
 
 def mask_s2_clouds(image):
@@ -49,11 +56,15 @@ def set_time(image):
   return image.set({'system:time_start':image.date().millis()})
 
 
+
 st.title("Map Analytics")
 
 col1, col2 = st.columns([4, 1])
 
 Map = geemap.Map()
+# Map.add_basemap("ESA WorldCover 2020 S2 FCC")
+# Map.add_basemap("ESA WorldCover 2020 S2 TCC")
+Map.add_basemap("HYBRID")
 
 aoi = ee.Geometry.Polygon(
   [[[8.559718,  49.952662],
@@ -61,6 +72,7 @@ aoi = ee.Geometry.Polygon(
     [8.752842, 49.794677],
     [8.752842, 49.952662]]]
   )
+
 
 sent2 = ee.ImageCollection("COPERNICUS/S2_SR_HARMONIZED").first()
 sent2_vis = {"bands": ["B2","B3","B4"]}
@@ -86,6 +98,13 @@ vis_ndvi_delta = {
         'palette': ['FF5733', 'AAFF00']
         }
 
+ndvi_forest = {
+   'min': 0,
+   'max': 0.1,
+   'palette':['FFFFFF','FF0000'],
+   'opacity':0.3,
+}
+
     
 with col2:
 
@@ -95,12 +114,22 @@ with col2:
 
     Map.setCenter(longitude, latitude, zoom)
 
-    start = st.date_input("Start Date for Dynamic World", datetime.date(2020, 1, 1))
-    end = st.date_input("End Date for Dynamic World", datetime.date(2021, 1, 1))
+    start = st.date_input("Start Date for Dynamic World", datetime.date(2018, 8, 1))
+    end = st.date_input("End Date for Dynamic World", datetime.date(2021, 8, 1))
 
     start_date = start.strftime("%Y-%m-%d")
     end_date = end.strftime("%Y-%m-%d")
 
+    # load Forests
+    list_polygons = json.load(open('forest_polygons/forest.json'))
+    out_list = []
+    for poly in list_polygons:
+       out_list.append(ee.Geometry.Polygon(poly['coordinates']))
+    forest_polygon = ee.Geometry.MultiPolygon(out_list)
+
+    # Dynamic World Land Cover
+    region = ee.Geometry.BBox(-179, -89, 179, 89)
+    dw = geemap.dynamic_world(region, start_date, end_date, return_type="hillshade")
 
     # Sentinel 2 Visual params
     sentinel_2 = (
@@ -133,15 +162,22 @@ with col2:
 
 
     # NDVI DELTA - town
-    # ndvi_diff_minus_town =  
+    # dw 
+    # forest = ee.ImageCollection('JAXA/ALOS/PALSAR/YEARLY/FNF').filterDate('2017-01-01', '2017-12-31').first()
+    
+    ndvi_diff_only_forest = ndvi_diff.clip(forest_polygon)
+
+    #mask = ee.Image(dw).eq(1)
+    #ndvi_diff_minus_town = dw.filter(ee.Filter.eq(1)).geometry()
 
 
-    region = ee.Geometry.BBox(-179, -89, 179, 89)
-    dw = geemap.dynamic_world(region, start_date, end_date, return_type="hillshade")
 
     layers = {
+        "NDVI Delta only Forest": (ndvi_diff_only_forest, ndvi_forest, "NDVI Delta only Forest"),
+        "default":(0,0,0),
         "Dynamic World": (dw, {}, "Dynamic World Land Cover"),
         "ESA Land Cover": (esa, esa_vis, "ESA Land Cover"),
+
         "Sentinel 2 Visual Params": (sentinel_2, vis_params,"Sentinel 2 Visual Params"),
         "Sentinel 2 NDVI": (ndvi, vis_ndvi_params, "Sentinel 2 NDVI"),
         "NDVI Delta": (ndvi_diff, vis_ndvi_delta, "NDVI Delta"),
@@ -149,8 +185,8 @@ with col2:
 
     options = list(layers.keys())
     selected_layer_key = st.selectbox("Select a layer", options, index=0)
-    
-    Map.add_layer(*layers[selected_layer_key])
+    if not selected_layer_key == "default":
+        Map.add_layer(*layers[selected_layer_key])
     
     if selected_layer_key == "Dynamic World":
         Map.add_legend(
