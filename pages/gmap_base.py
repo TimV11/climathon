@@ -11,34 +11,31 @@ st.title("NeyJourNeyJour")
 col1, col2 = st.columns([4, 1])
 
 Map = geemap.Map()
-Map.add_basemap("ESA WorldCover 2020 S2 FCC")
-Map.add_basemap("ESA WorldCover 2020 S2 TCC")
-Map.add_basemap("HYBRID")
 
+def set_time(image):
+  return image.set({'system:time_start':image.date().millis()})
 
-"test"
-esa = ee.ImageCollection("ESA/WorldCover/v100").first()
-esa_vis = {"bands": ["Map"]}
-esri = ee.ImageCollection(
-    "projects/sat-io/open-datasets/landcover/ESRI_Global-LULC_10m"
-).mosaic()
-esri_vis = {
-    "min": 1,
-    "max": 10,
-    "palette": [
-        "#1A5BAB",
-        "#358221",
-        "#A7D282",
-        "#87D19E",
-        "#FFDB5C",
-        "#EECFA8",
-        "#ED022A",
-        "#EDE9E4",
-        "#F2FAFF",
-        "#C8C8C8",
-    ],
-}
+aoi = ee.Geometry.Polygon(
+  [[[8.559718,  49.952662],
+    [8.559718, 49.794677],
+    [8.752842, 49.794677],
+    [8.752842, 49.952662]]]
+  )
 
+sentinel_2 = (
+    ee.ImageCollection('COPERNICUS/S2_SR_HARMONIZED')
+      .map(set_time)
+      .filterBounds(aoi)
+      .filterDate('2017-04-01', '2023-10-27')
+      .filter(ee.Filter.lt('CLOUDY_PIXEL_PERCENTAGE', 1))
+)
+
+vis_params = {
+    'min': 0,
+    'max': 3000,
+    'bands': ['B4', 'B3', 'B2'],
+    }
+Map.add_layer(sentinel_2, vis_params,"sentinel_2")
 
 markdown = """
     - [Dynamic World Land Cover](https://developers.google.com/earth-engine/datasets/catalog/GOOGLE_DYNAMICWORLD_V1?hl=en)
@@ -49,8 +46,8 @@ markdown = """
 
 with col2:
 
-    longitude = st.number_input("Longitude", -180.0, 180.0, -89.3998)
-    latitude = st.number_input("Latitude", -90.0, 90.0, 43.0886)
+    longitude = st.number_input("Longitude", -180.0, 180.0, 8.6512)
+    latitude = st.number_input("Latitude", -90.0, 90.0, 49.8728)
     zoom = st.number_input("Zoom", 0, 20, 11)
 
     Map.setCenter(longitude, latitude, zoom)
@@ -60,39 +57,6 @@ with col2:
 
     start_date = start.strftime("%Y-%m-%d")
     end_date = end.strftime("%Y-%m-%d")
-
-    region = ee.Geometry.BBox(-179, -89, 179, 89)
-    dw = geemap.dynamic_world(region, start_date, end_date, return_type="hillshade")
-
-    layers = {
-        "Dynamic World": geemap.ee_tile_layer(dw, {}, "Dynamic World Land Cover"),
-        "ESA Land Cover": geemap.ee_tile_layer(esa, esa_vis, "ESA Land Cover"),
-        "ESRI Land Cover": geemap.ee_tile_layer(esri, esri_vis, "ESRI Land Cover"),
-    }
-
-    options = list(layers.keys())
-    left = st.selectbox("Select a left layer", options, index=1)
-    right = st.selectbox("Select a right layer", options, index=0)
-
-    left_layer = layers[left]
-    right_layer = layers[right]
-
-    Map.split_map(left_layer, right_layer)
-
-    legend = st.selectbox("Select a legend", options, index=options.index(right))
-    if legend == "Dynamic World":
-        Map.add_legend(
-            title="Dynamic World Land Cover",
-            builtin_legend="Dynamic_World",
-        )
-    elif legend == "ESA Land Cover":
-        Map.add_legend(title="ESA Land Cover", builtin_legend="ESA_WorldCover")
-    elif legend == "ESRI Land Cover":
-        Map.add_legend(title="ESRI Land Cover", builtin_legend="ESRI_LandCover")
-
-    with st.expander("Data sources"):
-        st.markdown(markdown)
-
 
 with col1:
     Map.to_streamlit(height=750)
