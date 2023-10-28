@@ -46,11 +46,6 @@ st.markdown("""
 
 </style>""", unsafe_allow_html=True)
 
-
-
-
-
-
 logo = Image.open('./pics/CanopyAI.png')
 st.image(logo)
 
