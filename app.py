@@ -8,31 +8,25 @@ import matplotlib.pyplot as plt
 
 from datetime import datetime, timedelta
 
-
-
 # ------------------------------------------------------------
 #
 #                  Visual settings
 #
 # ------------------------------------------------------------
-st.markdown(
-    """
-    <style>
-    body {
-        background-color: #f0f0f0; /* Change background color */
-        color: #333; /* Change text color */
-        /* Additional style adjustments */
-    }
-    </style>
-    """,
-    unsafe_allow_html=True
+
+st.set_page_config(
+     initial_sidebar_state="collapsed",
 )
+
+
+
+
 
 
 logo = Image.open('./pics/CanopyAI.png')
 st.image(logo)
 
-tab1, tab2, tab3 = st.tabs(["landing page", "interactive map", "about us"])
+tab1, tab2, tab3 = st.tabs(["Our purpose", "Case study: Darmstadt", "About us"])
 
 with tab1:
     
@@ -48,11 +42,11 @@ with tab1:
     st.write("At CanopyAI, we're on a mission to use cutting-edge technology for sustainable forest preservation. Through advanced data analysis, powered by the Sentinel 2 mission, we're committed to safeguarding and revitalizing our forests, ensuring a greener, more sustainable future for all.")
 
     st.subheader("What We Do.")
-    st.write("Service 1: Satellite Data Analysis:")
+    st.markdown("**Satellite Data Analysis**")
     st.write("We harness data from the Sentinel 2 mission to monitor the health of your forest, capturing every detail from above.")
-    st.write("Service 2: Machine Learning Insights:")
+    st.markdown("**Machine Learning Insights**")
     st.write("Our advanced machine learning algorithms analyze this data to predict forest conditions and assess environmental impact.")
-    st.write("Service 3: Actionable Recommendations:")
+    st.markdown("**Actionable Recommendations**")
     st.write("We deliver actionable recommendations, empowering you to take effective measures for forest revitalization.")
 
     st.subheader("Get in Touch.")
