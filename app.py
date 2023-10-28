@@ -8,12 +8,63 @@ import matplotlib.pyplot as plt
 
 from datetime import datetime, timedelta
 
+
+
+# ------------------------------------------------------------
+#
+#                  Visual settings
+#
+# ------------------------------------------------------------
+st.markdown(
+    """
+    <style>
+    body {
+        background-color: #f0f0f0; /* Change background color */
+        color: #333; /* Change text color */
+        /* Additional style adjustments */
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
+
 st.write("# CanopyAI 🌳👑")
 
 tab1, tab2, tab3 = st.tabs(["landing page", "interactive map", "about us"])
 
 with tab1:
-    # Using object notation
+    logo = Image.open('./pics/CanopyAI.png')
+    st.image(logo)
+    st.header("Revitalizing Forests with Satellite Intelligence.")
+    with st.container():
+        st.subheader("CanopyAI: Your Forest's Guardian.")
+        if st.button('get started'):
+            tab2()
+
+
+    with st.container():
+        st.subheader("Who We Are.")
+    st.write("At CanopyAI, we're on a mission to use cutting-edge technology for sustainable forest preservation. Through advanced data analysis, powered by the Sentinel 2 mission, we're committed to safeguarding and revitalizing our forests, ensuring a greener, more sustainable future for all.")
+
+    st.subheader("What We Do.")
+    st.write("Service 1: Satellite Data Analysis:")
+    st.write("We harness data from the Sentinel 2 mission to monitor the health of your forest, capturing every detail from above.")
+    st.write("Service 2: Machine Learning Insights:")
+    st.write("Our advanced machine learning algorithms analyze this data to predict forest conditions and assess environmental impact.")
+    st.write("Service 3: Actionable Recommendations:")
+    st.write("We deliver actionable recommendations, empowering you to take effective measures for forest revitalization.")
+
+    st.subheader("Get in Touch.")
+    st.write("Include a contact form for inquiries or consultations.")
+    st.write("Provide your email address and phone number for direct contact.")
+    st.write("CTA Button: Contact Us or Request Consultation.")
+
+    #Footer:
+    #Copyright Information: "© [Current Year] CanopyAI. All Rights Reserved."
+
+with tab2:
+        # Using object notation
     # Erstelle einen Date/Time-Schieberegler mit einem Wochenbereich
     start_date = datetime(2020, 1, 1)
     end_date = start_date + timedelta(weeks=100)
@@ -49,7 +100,7 @@ with tab1:
         else:
             st.write('fuck off')
 
-with tab2:
+
     "TODO insert smth here"
 
 with tab3:
