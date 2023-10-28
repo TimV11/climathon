@@ -57,16 +57,33 @@ with col2:
     vis_ndvi_params = {
         'min': -1,
         'max': 0.5,
-        'palette': ['FFFFFF', '274e13']
+        'palette': ['FFFFFF', 'AAFF00']
+        }
+    
+    vis_ndvi_delta = {
+        'min': -0.05,
+        'max': 0.05,
+        'palette': ['FF5733', 'AAFF00']
         }
 
-    NIR = sentinel_2.select('B4').first()
-    Red = sentinel_2.select('B3').first()
+    NIR_first = sentinel_2.select('B4').first()
+    Red_first = sentinel_2.select('B3').first()
+    ndvi_first = NIR_first.subtract(Red_first).divide(NIR_first.add(Red_first))
 
-    ndvi = NIR.subtract(Red).divide(NIR.add(Red))
+    sentinel_2_backwards = sentinel_2.sort('system:time_start', False)
+    NIR_last = sentinel_2_backwards.select('B4').first()
+    Red_last = sentinel_2_backwards.select('B3').first()
+    ndvi_last = NIR_last.subtract(Red_last).divide(NIR_last.add(Red_last))
+
+    ndvi_diff = ndvi_last.subtract(ndvi_first)
 
     Map.add_layer(sentinel_2, vis_params,"sentinel_2")
-    Map.add_layer(ndvi,vis_ndvi_params,"NDVI")
+    Map.add_layer(ndvi_first,vis_ndvi_params,"NDVI first")
+    Map.add_layer(ndvi_last,vis_ndvi_params,"NDVI last")
+    Map.add_layer(ndvi_diff,vis_ndvi_delta,"NDVI diff")
+
+
+
 
 
 with col1:
