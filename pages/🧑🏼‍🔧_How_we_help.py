@@ -1,5 +1,26 @@
 import streamlit as st
 
+
+st.set_page_config(
+    layout="centered",
+    #initial_sidebar_state="collapsed",
+)
+
+st.sidebar.title("Contact Us")
+st.sidebar.info(
+    """ [Send us an E-Mail!](mailto:contact@climathon.digital) """
+)
+
+st.sidebar.title("Source Code")
+st.sidebar.info(
+
+    """
+    - Web App URL: <http://climathon.digital:8501/>
+    - Our GitHub Repository: <https://github.com/TimV11/climathon>
+    """
+)
+
+
 # Title
 st.title("Enhancing Forest Health with Satellite Technology")
 
