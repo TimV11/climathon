@@ -56,44 +56,16 @@ with tab1:
     #Copyright Information: "© [Current Year] CanopyAI. All Rights Reserved."
 
 with tab2:
-        # Using object notation
-    # Erstelle einen Date/Time-Schieberegler mit einem Wochenbereich
-    start_date = datetime(2020, 1, 1)
-    end_date = start_date + timedelta(weeks=100)
-
-    selected_date = st.sidebar.slider(
-        "Select a date range",
-        min_value=start_date,
-        max_value=end_date,
-        value=(start_date, end_date),
-        step=timedelta(days=1),
-    )
-    num_turns = st.sidebar.slider("some bullshit", 1, 100, 9)
-
-    add_selectbox = st.sidebar.selectbox(
-        "Background map",
-        ("default", "terrain", "satellite")
-    )
-
-    # Using "with" notation
     with st.sidebar:
-        add_radio = st.radio(
-            "Choose a indicator",
-            ("dry", "wet", "ligma")
-        )
-
-    with st.sidebar:
-        st.button("Reset", type="primary")
         if st.button('centralize '):
             pdk.View(
                 longitude=8.65027, latitude=49.87167 , zoom=11, min_zoom=5, max_zoom=15, pitch=0, bearing=0
             )
             st.write('centralized to darmstadt')
         else:
-            st.write('fuck off')
-
-
-    "TODO insert smth here"
+            st.write('')
+    st.link_button("Get started", "http://climathon.digital:8501/gmap_base")
+    
 
 with tab3:
 
