@@ -18,6 +18,29 @@ st.set_page_config(
      initial_sidebar_state="collapsed",
 )
 
+st.markdown("""
+<style>
+
+	.stTabs [data-baseweb="tab-list"] {
+		gap: 2px;
+    }
+
+	.stTabs [data-baseweb="tab"] {
+		height: 50px;
+        white-space: pre-wrap;
+		background-color: #F0F2F6;
+		border-radius: 4px 4px 0px 0px;
+		gap: 1px;
+		padding-top: 10px;
+		padding-bottom: 10px;
+    }
+
+	.stTabs [aria-selected="true"] {
+  		background-color: #FFFFFF;
+	}
+
+</style>""", unsafe_allow_html=True)
+
 
 
 
@@ -26,9 +49,11 @@ st.set_page_config(
 logo = Image.open('./pics/CanopyAI.png')
 st.image(logo)
 
-tab1, tab2, tab3 = st.tabs(["Our purpose", "Case study: Darmstadt", "About us"])
-
-with tab1:
+listTabs = ["Our purpose", "Case study: Darmstadt", "About us"]
+tabs = st.tabs(listTabs)
+whitespace = 9
+tabs = st.tabs([s.center(whitespace,"\u2001") for s in listTabs])
+with tabs[0]:
     
     st.header("Revitalizing Forests with Satellite Intelligence.")
     with st.container():
@@ -55,7 +80,7 @@ with tab1:
     #Footer:
     #Copyright Information: "© [Current Year] CanopyAI. All Rights Reserved."
 
-with tab2:
+with tabs[1]:
     with st.sidebar:
         if st.button('centralize '):
             pdk.View(
@@ -68,7 +93,7 @@ with tab2:
     st.link_button("Get started", "http://climathon.digital:8501/gmap_base")
     
 
-with tab3:
+with tabs[2]:
 
     col1, col2, col3 = st.columns(3, gap="large")
 

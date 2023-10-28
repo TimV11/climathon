@@ -80,8 +80,8 @@ with col2:
 
     Map.setCenter(longitude, latitude, zoom)
 
-    date = st.date_input("Date", datetime.date(2020, 1, 1))
-    date_date = date.strftime("%Y-%m-%d")
+    start = st.date_input("Start Date for Dynamic World", datetime.date(2020, 1, 1))
+    end = st.date_input("End Date for Dynamic World", datetime.date(2021, 1, 1))
 
     start_date = start.strftime("%Y-%m-%d")
     end_date = end.strftime("%Y-%m-%d")
